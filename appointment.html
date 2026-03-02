@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book an Appointment · AP Test Crematory</title>
+    <meta name="description"
+        content="Schedule a cremation, in-home euthanasia, or memorial service for your pet. AP Test Crematory — Los Angeles, CA." />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+    <style>
+        /* Appointment-specific overrides */
+        body {
+            background: var(--clr-bg-light);
+        }
+
+        .appt-hero {
+            background: linear-gradient(135deg, var(--clr-navy-deep) 0%, #143d6b 60%, var(--clr-navy) 100%);
+            padding: 128px 28px 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .appt-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 70% at 80% 30%, rgba(0, 194, 240, 0.10) 0%, transparent 60%);
+        }
+
+        .appt-hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.9rem, 4vw, 2.8rem);
+            color: var(--clr-white);
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .appt-hero-sub {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+            max-width: 420px;
+            margin: 0 auto 44px;
+            position: relative;
+        }
+
+        /* Step Indicator */
+        .step-indicator-wrap {
+            position: relative;
+            z-index: 2;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .step-ind-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-ind-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 17px;
+            left: calc(50% + 18px);
+            right: calc(-50% + 18px);
+            height: 2px;
+            border-top: 2px dashed rgba(255, 255, 255, 0.18);
+        }
+
+        .step-ind-item.done:not(:last-child)::after {
+            border-top-style: solid;
+            border-color: var(--clr-blue);
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+        .step-ind-item.active .step-circle {
+            background: var(--clr-blue);
+            border-color: var(--clr-blue);
+            color: white;
+            box-shadow: 0 0 0 5px rgba(0, 160, 216, 0.25);
+        }
+
+        .step-ind-item.done .step-circle {
+            background: var(--clr-blue-dark);
+            border-color: var(--clr-blue-dark);
+            color: white;
+        }
+
+        .step-ind-label {
+            font-size: 0.66rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.35);
+            text-align: center;
+            max-width: 80px;
+        }
+
+        .step-ind-item.active .step-ind-label {
+            color: var(--clr-accent);
+        }
+
+        .step-ind-item.done .step-ind-label {
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        /* Form wrapper */
+        .appt-body {
+            max-width: 720px;
+            margin: -40px auto 80px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .form-card {
+            background: var(--clr-white);
+            border-radius: var(--radius-lg);
+            padding: 48px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.35s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-section-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--clr-navy);
+            margin-bottom: 5px;
+        }
+
+        .form-section-sub {
+            font-size: 0.88rem;
+            color: var(--clr-gray-500);
+            margin-bottom: 36px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 0.79rem;
+            font-weight: 600;
+            color: var(--clr-text-dark);
+            letter-spacing: 0.02em;
+        }
+
+        .required-star {
+            color: var(--clr-blue);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            font-family: var(--font-body);
+            font-size: 0.92rem;
+            color: var(--clr-navy);
+            background: var(--clr-bg-light);
+            border: 1.5px solid var(--clr-gray-100);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            outline: none;
+            width: 100%;
+            -webkit-appearance: none;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--clr-blue);
+            box-shadow: 0 0 0 3px rgba(0, 160, 216, 0.12);
+            background: var(--clr-white);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 96px;
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234E677E' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 38px;
+            cursor: pointer;
+        }
+
+        /* Service Option Cards */
+        .service-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .svc-opt {
+            border: 2px solid var(--clr-gray-100);
+            border-radius: var(--radius-md);
+            padding: 20px 18px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .svc-opt:hover {
+            border-color: var(--clr-blue-mid);
+            background: var(--clr-bg-subtle);
+        }
+
+        .svc-opt.selected {
+            border-color: var(--clr-blue);
+            background: #EEF8FE;
+        }
+
+        .svc-opt input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .svc-opt-check {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--clr-gray-300);
+            transition: var(--transition);
+        }
+
+        .svc-opt.selected .svc-opt-check {
+            background: var(--clr-blue);
+            border-color: var(--clr-blue);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .svc-opt-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            color: var(--clr-blue);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .svc-opt-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--clr-navy);
+            margin-bottom: 5px;
+        }
+
+        .svc-opt-desc {
+            font-size: 0.78rem;
+            color: var(--clr-gray-500);
+            line-height: 1.5;
+        }
+
+        /* Addons */
+        .addons-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 11px;
+            margin-bottom: 28px;
+        }
+
+        .addon-opt {
+            border: 1.5px solid var(--clr-gray-100);
+            border-radius: var(--radius-sm);
+            padding: 13px 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+        }
+
+        .addon-opt:hover {
+            border-color: var(--clr-blue-mid);
+        }
+
+        .addon-opt.checked {
+            border-color: var(--clr-blue);
+            background: #EEF8FE;
+        }
+
+        .addon-opt input {
+            display: none;
+        }
+
+        .addon-check-box {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--clr-gray-300);
+            border-radius: 4px;
+            flex-shrink: 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+
+        .addon-opt.checked .addon-check-box {
+            background: var(--clr-blue);
+            border-color: var(--clr-blue);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .addon-name {
+            font-size: 0.79rem;
+            font-weight: 600;
+            color: var(--clr-navy);
+            line-height: 1.35;
+        }
+
+        .addon-opt.checked .addon-name {
+            color: var(--clr-blue-dark);
+        }
+
+        /* Auth checkboxes */
+        .auth-box {
+            background: var(--clr-bg-subtle);
+            border: 1.5px solid var(--clr-gray-100);
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: border-color var(--transition);
+        }
+
+        .auth-box:hover {
+            border-color: var(--clr-blue-mid);
+        }
+
+        .auth-box.checked {
+            border-color: var(--clr-blue);
+            background: #EEF8FE;
+        }
+
+        .auth-box input {
+            display: none;
+        }
+
+        .auth-box-text p {
+            font-size: 0.85rem;
+            color: var(--clr-text-body);
+            line-height: 1.6;
+        }
+
+        .auth-box-text strong {
+            font-size: 0.88rem;
+            color: var(--clr-navy);
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* Summary */
+        .summary-block {
+            background: var(--clr-bg-light);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .summary-block-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            color: var(--clr-blue);
+            margin-bottom: 14px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--clr-gray-100);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-row .label {
+            color: var(--clr-gray-700);
+        }
+
+        .summary-row .value {
+            font-weight: 600;
+            color: var(--clr-navy);
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--clr-navy);
+            padding-top: 16px;
+            margin-top: 8px;
+            border-top: 2px solid var(--clr-gray-100);
+        }
+
+        .note-box {
+            background: #FFF8E8;
+            border-left: 3px solid #F5A623;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 14px 18px;
+            font-size: 0.83rem;
+            color: #7A5A1A;
+            margin-bottom: 20px;
+        }
+
+        /* Timeslot picker */
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .time-slot {
+            border: 1.5px solid var(--clr-gray-100);
+            border-radius: var(--radius-sm);
+            padding: 11px 6px;
+            text-align: center;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--clr-navy);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .time-slot:hover {
+            border-color: var(--clr-blue-mid);
+            background: var(--clr-bg-subtle);
+        }
+
+        .time-slot.selected {
+            border-color: var(--clr-blue);
+            background: #EEF8FE;
+            color: var(--clr-blue-dark);
+        }
+
+        .time-slot.unavailable {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        /* Success screen */
+        .success-screen {
+            text-align: center;
+            padding: 32px 0 16px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--clr-blue), var(--clr-navy));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .success-title {
+            font-family: var(--font-display);
+            font-size: 1.9rem;
+            color: var(--clr-navy);
+            margin-bottom: 12px;
+        }
+
+        .success-sub {
+            color: var(--clr-gray-700);
+            font-size: 0.95rem;
+            max-width: 400px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+        }
+
+        .success-ref {
+            display: inline-block;
+            background: var(--clr-bg-light);
+            border: 1px dashed var(--clr-blue);
+            border-radius: var(--radius-sm);
+            padding: 10px 22px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--clr-blue-dark);
+            letter-spacing: 0.05em;
+            margin-bottom: 32px;
+        }
+
+        /* Nav buttons */
+        .form-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 1px solid var(--clr-gray-100);
+        }
+
+        .form-nav.first-step {
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 640px) {
+            .form-card {
+                padding: 28px 18px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .service-options {
+                grid-template-columns: 1fr;
+            }
+
+            .addons-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .time-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .step-ind-label {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Nav -->
+    <nav class="navbar scrolled" id="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M4.5 11.5A2.5 2.5 0 1 0 4.5 6.5 2.5 2.5 0 0 0 4.5 11.5zm15 0A2.5 2.5 0 1 0 19.5 6.5 2.5 2.5 0 0 0 19.5 11.5zm-10-7A2.5 2.5 0 1 0 9.5.5 2.5 2.5 0 0 0 9.5 4.5zm5 0A2.5 2.5 0 1 0 14.5.5 2.5 2.5 0 0 0 14.5 4.5zM12 9c-3.5 0-7 2.5-7 6.5 0 3.5 2.5 5.5 7 5.5s7-2 7-5.5C19 11.5 15.5 9 12 9z" />
+                    </svg>
+                </div>
+                <div class="nav-logo-text">
+                    <span class="nav-logo-name">AP Test Crematory</span>
+                    <span class="nav-logo-tagline">Compassionate Pet Aftercare</span>
+                </div>
+            </a>
+            <div class="nav-cta">
+                <span class="nav-phone" style="color:var(--clr-text-body);">📞 (310) 555-0100</span>
+                <a href="index.html" class="btn btn-outline">← Back to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="appt-hero">
+        <h1 class="appt-hero-title">Book an Appointment</h1>
+        <p class="appt-hero-sub">We'll guide you through each step. This takes about 5 minutes.</p>
+
+        <div class="step-indicator-wrap">
+            <div class="step-indicator" id="step-indicator">
+                <div class="step-ind-item active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-ind-label">Owner &amp; Pet Info</div>
+                </div>
+                <div class="step-ind-item" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-ind-label">Service &amp; Package</div>
+                </div>
+                <div class="step-ind-item" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-ind-label">Authorization</div>
+                </div>
+                <div class="step-ind-item" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-ind-label">Order Summary</div>
+                </div>
+                <div class="step-ind-item" data-step="5">
+                    <div class="step-circle">5</div>
+                    <div class="step-ind-label">Schedule</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Body -->
+    <div class="appt-body">
+        <div class="form-card">
+
+            <!-- ─── Step 1: Owner & Pet Info ─── -->
+            <div class="form-step active" id="step-1">
+                <h2 class="form-section-title">Owner &amp; Pet Information</h2>
+                <p class="form-section-sub">Tell us a little about yourself and your beloved companion.</p>
+
+                <p style="font-size:0.8rem; color:var(--clr-gray-500); margin-bottom:22px;">Owner Information</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name <span class="required-star">*</span></label>
+                        <input type="text" class="form-input" id="owner-first" placeholder="John" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name <span class="required-star">*</span></label>
+                        <input type="text" class="form-input" id="owner-last" placeholder="Doe" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Phone Number <span class="required-star">*</span></label>
+                        <input type="tel" class="form-input" id="owner-phone" placeholder="(310) 555-0100" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address <span class="required-star">*</span></label>
+                        <input type="email" class="form-input" id="owner-email" placeholder="you@email.com" required />
+                    </div>
+                </div>
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label class="form-label">Home Address</label>
+                        <input type="text" class="form-input" id="owner-address"
+                            placeholder="123 Main St, Los Angeles, CA 90001" />
+                    </div>
+                </div>
+
+                <p style="font-size:0.8rem; color:var(--clr-gray-500); margin: 24px 0 16px;">Pet Information</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Pet's Name <span class="required-star">*</span></label>
+                        <input type="text" class="form-input" id="pet-name" placeholder="Buddy" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Species <span class="required-star">*</span></label>
+                        <select class="form-select" id="pet-species">
+                            <option value="">Select species</option>
+                            <option>Dog</option>
+                            <option>Cat</option>
+                            <option>Rabbit</option>
+                            <option>Bird</option>
+                            <option>Hamster / Gerbil</option>
+                            <option>Guinea Pig</option>
+                            <option>Reptile</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Breed</label>
+                        <input type="text" class="form-input" id="pet-breed" placeholder="e.g. Labrador Retriever" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Weight (lbs) <span class="required-star">*</span></label>
+                        <input type="number" class="form-input" id="pet-weight" placeholder="e.g. 45" min="0" />
+                    </div>
+                </div>
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label class="form-label">Anything you'd like us to know</label>
+                        <textarea class="form-textarea" id="pet-notes"
+                            placeholder="Special requests, personality traits, or any notes for our team..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-nav first-step">
+                    <button class="btn btn-primary btn-lg" onclick="nextStep(1)">
+                        Continue
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ─── Step 2: Service & Package ─── -->
+            <div class="form-step" id="step-2">
+                <h2 class="form-section-title">Service &amp; Package</h2>
+                <p class="form-section-sub">Choose the cremation type and any additional memorial items.</p>
+
+                <p style="font-size:0.8rem; font-weight:600; color:var(--clr-text-dark); margin-bottom:14px;">Cremation
+                    Type <span class="required-star">*</span></p>
+                <div class="service-options">
+                    <label class="svc-opt selected" id="opt-private">
+                        <input type="radio" name="cremation" value="private" checked />
+                        <div class="svc-opt-check"></div>
+                        <span class="svc-opt-label">Most Private</span>
+                        <div class="svc-opt-title">Private Cremation</div>
+                        <div class="svc-opt-desc">Individual cremation — only your pet. Ashes returned guaranteed.</div>
+                    </label>
+                    <label class="svc-opt" id="opt-communal">
+                        <input type="radio" name="cremation" value="communal" />
+                        <div class="svc-opt-check"></div>
+                        <span class="svc-opt-label">Affordable</span>
+                        <div class="svc-opt-title">Communal Cremation</div>
+                        <div class="svc-opt-desc">Cremated with other pets. Ashes are not returned individually.</div>
+                    </label>
+                    <label class="svc-opt" id="opt-euthanasia">
+                        <input type="radio" name="cremation" value="euthanasia" />
+                        <div class="svc-opt-check"></div>
+                        <span class="svc-opt-label">At-Home</span>
+                        <div class="svc-opt-title">In-Home Euthanasia</div>
+                        <div class="svc-opt-desc">A peaceful passing in the comfort of your home, with cremation
+                            follow-up.</div>
+                    </label>
+                    <label class="svc-opt" id="opt-pickup">
+                        <input type="radio" name="cremation" value="pickup" />
+                        <div class="svc-opt-check"></div>
+                        <span class="svc-opt-label">Transport</span>
+                        <div class="svc-opt-title">Pickup Only</div>
+                        <div class="svc-opt-desc">We handle respectful transportation to our facility.</div>
+                    </label>
+                </div>
+
+                <p style="font-size:0.8rem; font-weight:600; color:var(--clr-text-dark); margin-bottom:14px;">Urn Style
+                    (Optional)</p>
+                <div class="form-row single" style="margin-bottom:24px;">
+                    <div class="form-group">
+                        <select class="form-select" id="urn-select">
+                            <option value="">No urn selected</option>
+                            <option>Marble Classic</option>
+                            <option>Walnut Wood</option>
+                            <option>Hand-Painted Ceramic</option>
+                            <option>Biodegradable Earth Urn</option>
+                            <option>Blue Ceramic</option>
+                            <option>Obsidian Stone</option>
+                            <option>Rose Porcelain</option>
+                            <option>Cloud White Ceramic</option>
+                            <option>Ocean Glaze</option>
+                            <option>Autumn Oak Wood</option>
+                            <option>Gold Trim Ceramic</option>
+                            <option>Cobalt Round</option>
+                            <option>Heart Shape</option>
+                            <option>Crescent Moon</option>
+                            <option>Paw Engraved Wood</option>
+                        </select>
+                    </div>
+                </div>
+
+                <p style="font-size:0.8rem; font-weight:600; color:var(--clr-text-dark); margin-bottom:14px;">Memorial
+                    Add-Ons (Select all that apply)</p>
+                <div class="addons-grid">
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Paw Print</div>
+                    </label>
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Nose Print</div>
+                    </label>
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Urn Engraving</div>
+                    </label>
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Memorial Jewelry</div>
+                    </label>
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Fur Clipping</div>
+                    </label>
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Photo Frame</div>
+                    </label>
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Certificate</div>
+                    </label>
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Memorial Seed</div>
+                    </label>
+                    <label class="addon-opt" onclick="toggleAddon(this)">
+                        <input type="checkbox" />
+                        <div class="addon-check-box"></div>
+                        <div class="addon-name">Grief Support Kit</div>
+                    </label>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn btn-outline" onclick="prevStep(2)">← Back</button>
+                    <button class="btn btn-primary btn-lg" onclick="nextStep(2)">
+                        Continue
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ─── Step 3: Authorization ─── -->
+            <div class="form-step" id="step-3">
+                <h2 class="form-section-title">Authorization &amp; Release</h2>
+                <p class="form-section-sub">Please review and acknowledge the following before we proceed.</p>
+
+                <label class="auth-box" onclick="toggleAuth(this)">
+                    <input type="checkbox" />
+                    <div class="addon-check-box" style="width:20px;height:20px;border-radius:5px;"></div>
+                    <div class="auth-box-text">
+                        <strong>Authorization to Cremate</strong>
+                        <p>I authorize AP Test Crematory to perform the cremation service for my pet as described in
+                            this form. I confirm I am the legal owner or authorized representative.</p>
+                    </div>
+                </label>
+
+                <label class="auth-box" onclick="toggleAuth(this)">
+                    <input type="checkbox" />
+                    <div class="addon-check-box" style="width:20px;height:20px;border-radius:5px;"></div>
+                    <div class="auth-box-text">
+                        <strong>Release of Remains</strong>
+                        <p>I understand and accept the terms of the selected cremation type regarding the return (or
+                            non-return) of remains and any keepsake items.</p>
+                    </div>
+                </label>
+
+                <label class="auth-box" onclick="toggleAuth(this)">
+                    <input type="checkbox" />
+                    <div class="addon-check-box" style="width:20px;height:20px;border-radius:5px;"></div>
+                    <div class="auth-box-text">
+                        <strong>Privacy &amp; Handling Policy</strong>
+                        <p>I acknowledge that AP Test Crematory handles all pets with the utmost care and dignity and
+                            agree to the privacy policy and terms of service.</p>
+                    </div>
+                </label>
+
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label class="form-label">Digital Signature (Full Name) <span
+                                class="required-star">*</span></label>
+                        <input type="text" class="form-input" id="signature" placeholder="Type your full name to sign"
+                            style="font-style:italic;" />
+                    </div>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn btn-outline" onclick="prevStep(3)">← Back</button>
+                    <button class="btn btn-primary btn-lg" onclick="nextStep(3)">
+                        Continue
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ─── Step 4: Summary ─── -->
+            <div class="form-step" id="step-4">
+                <h2 class="form-section-title">Order Summary</h2>
+                <p class="form-section-sub">Review your selections before scheduling.</p>
+
+                <div class="note-box">
+                    ⚠️ A team member will contact you to confirm pricing based on your pet's weight and services
+                    selected.
+                </div>
+
+                <div class="summary-block">
+                    <div class="summary-block-title">Owner</div>
+                    <div class="summary-row"><span class="label">Name</span><span class="value" id="sum-name">—</span>
+                    </div>
+                    <div class="summary-row"><span class="label">Phone</span><span class="value" id="sum-phone">—</span>
+                    </div>
+                    <div class="summary-row"><span class="label">Email</span><span class="value" id="sum-email">—</span>
+                    </div>
+                </div>
+
+                <div class="summary-block">
+                    <div class="summary-block-title">Pet</div>
+                    <div class="summary-row"><span class="label">Name</span><span class="value" id="sum-pet">—</span>
+                    </div>
+                    <div class="summary-row"><span class="label">Species / Breed</span><span class="value"
+                            id="sum-species">—</span></div>
+                    <div class="summary-row"><span class="label">Weight</span><span class="value"
+                            id="sum-weight">—</span></div>
+                </div>
+
+                <div class="summary-block">
+                    <div class="summary-block-title">Services</div>
+                    <div class="summary-row"><span class="label">Cremation Type</span><span class="value"
+                            id="sum-service">Private Cremation</span></div>
+                    <div class="summary-row"><span class="label">Urn</span><span class="value" id="sum-urn">None
+                            selected</span></div>
+                    <div class="summary-row"><span class="label">Add-ons</span><span class="value"
+                            id="sum-addons">None</span></div>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn btn-outline" onclick="prevStep(4)">← Back</button>
+                    <button class="btn btn-primary btn-lg" onclick="nextStep(4)">
+                        Schedule Pickup
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ─── Step 5: Schedule ─── -->
+            <div class="form-step" id="step-5">
+                <h2 class="form-section-title">Schedule Pickup</h2>
+                <p class="form-section-sub">Select your preferred date and time for our team to arrive.</p>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Preferred Date <span class="required-star">*</span></label>
+                        <input type="date" class="form-input" id="pickup-date" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Preferred Contact Method</label>
+                        <select class="form-select">
+                            <option>Phone Call</option>
+                            <option>Text / SMS</option>
+                            <option>Email</option>
+                        </select>
+                    </div>
+                </div>
+
+                <p style="font-size:0.8rem; font-weight:600; color:var(--clr-text-dark); margin-bottom:12px;">Preferred
+                    Time Window</p>
+                <div class="time-grid" id="time-grid">
+                    <div class="time-slot" onclick="selectTime(this)">8:00 AM</div>
+                    <div class="time-slot" onclick="selectTime(this)">9:00 AM</div>
+                    <div class="time-slot" onclick="selectTime(this)">10:00 AM</div>
+                    <div class="time-slot" onclick="selectTime(this)">11:00 AM</div>
+                    <div class="time-slot" onclick="selectTime(this)">12:00 PM</div>
+                    <div class="time-slot" onclick="selectTime(this)">1:00 PM</div>
+                    <div class="time-slot" onclick="selectTime(this)">2:00 PM</div>
+                    <div class="time-slot" onclick="selectTime(this)">3:00 PM</div>
+                    <div class="time-slot" onclick="selectTime(this)">4:00 PM</div>
+                    <div class="time-slot" onclick="selectTime(this)">5:00 PM</div>
+                    <div class="time-slot" onclick="selectTime(this)">6:00 PM</div>
+                    <div class="time-slot unavailable">7:00 PM</div>
+                </div>
+
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label class="form-label">Additional Notes for Pickup</label>
+                        <textarea class="form-textarea"
+                            placeholder="Gate code, parking info, any access instructions..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn btn-outline" onclick="prevStep(5)">← Back</button>
+                    <button class="btn btn-primary btn-lg" onclick="submitForm()">
+                        Confirm Appointment
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ─── Success ─── -->
+            <div class="form-step" id="step-success">
+                <div class="success-screen">
+                    <div class="success-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                    </div>
+                    <h2 class="success-title">Appointment Confirmed</h2>
+                    <p class="success-sub">Thank you for entrusting us with your beloved companion. Our team will be in
+                        touch within 30 minutes to confirm your appointment details.</p>
+                    <div class="success-ref" id="ref-number">REF #AP-0001</div>
+                    <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+                        <a href="index.html" class="btn btn-primary">← Back to Home</a>
+                        <a href="tel:+13105550100" class="btn btn-outline">Call (310) 555-0100</a>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /form-card -->
+    </div><!-- /appt-body -->
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-bottom" style="justify-content:center; text-align:center;">
+                <span>© 2026 AP Test Crematory · 123 Main St Apt 4B, Los Angeles CA 90001 · <a href="tel:+13105550100"
+                        style="color:var(--clr-accent)">(310) 555-0100</a></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        // Set min date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('pickup-date').min = today;
+        document.getElementById('pickup-date').value = today;
+
+        function updateIndicator(step) {
+            const items = document.querySelectorAll('.step-ind-item');
+            items.forEach((item, i) => {
+                const n = i + 1;
+                item.classList.remove('active', 'done');
+                if (n < step) item.classList.add('done');
+                if (n === step) item.classList.add('active');
+            });
+        }
+
+        function showStep(n) {
+            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById('step-' + n) || document.getElementById('step-success');
+            if (target) target.classList.add('active');
+            updateIndicator(n);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextStep(from) {
+            if (from < totalSteps) {
+                if (from === 3) populateSummary();
+                currentStep = from + 1;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep(from) {
+            if (from > 1) {
+                currentStep = from - 1;
+                showStep(currentStep);
+            }
+        }
+
+        function populateSummary() {
+            const first = document.getElementById('owner-first').value || '—';
+            const last = document.getElementById('owner-last').value || '';
+            document.getElementById('sum-name').textContent = `${first} ${last}`.trim();
+            document.getElementById('sum-phone').textContent = document.getElementById('owner-phone').value || '—';
+            document.getElementById('sum-email').textContent = document.getElementById('owner-email').value || '—';
+            document.getElementById('sum-pet').textContent = document.getElementById('pet-name').value || '—';
+
+            const species = document.getElementById('pet-species').value || '';
+            const breed = document.getElementById('pet-breed').value || '';
+            document.getElementById('sum-species').textContent = [species, breed].filter(Boolean).join(' / ') || '—';
+
+            const weight = document.getElementById('pet-weight').value;
+            document.getElementById('sum-weight').textContent = weight ? `${weight} lbs` : '—';
+
+            const serviceMap = {
+                private: 'Private Cremation',
+                communal: 'Communal Cremation',
+                euthanasia: 'In-Home Euthanasia',
+                pickup: 'Pickup Only',
+            };
+            const selected = document.querySelector('input[name="cremation"]:checked');
+            document.getElementById('sum-service').textContent = serviceMap[selected?.value] || '—';
+
+            const urn = document.getElementById('urn-select').value;
+            document.getElementById('sum-urn').textContent = urn || 'None selected';
+
+            const addons = [...document.querySelectorAll('.addon-opt.checked .addon-name')].map(el => el.textContent);
+            document.getElementById('sum-addons').textContent = addons.length ? addons.join(', ') : 'None';
+        }
+
+        function submitForm() {
+            const ref = 'AP-' + String(Math.floor(Math.random() * 90000) + 10000);
+            document.getElementById('ref-number').textContent = 'REF #' + ref;
+            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-success').classList.add('active');
+            const indicator = document.querySelector('.step-indicator-wrap');
+            if (indicator) indicator.style.opacity = '0.4';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Service option toggle
+        document.querySelectorAll('.svc-opt').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.querySelectorAll('.svc-opt').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                opt.querySelector('input').checked = true;
+            });
+        });
+
+        function toggleAddon(el) {
+            el.classList.toggle('checked');
+        }
+
+        function toggleAuth(el) {
+            el.classList.toggle('checked');
+            const box = el.querySelector('.addon-check-box');
+            if (el.classList.contains('checked')) {
+                box.style.background = 'var(--clr-blue)';
+                box.style.borderColor = 'var(--clr-blue)';
+                box.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E\")";
+                box.style.backgroundRepeat = 'no-repeat';
+                box.style.backgroundPosition = 'center';
+            } else {
+                box.style.background = '';
+                box.style.borderColor = '';
+                box.style.backgroundImage = '';
+            }
+        }
+
+        function selectTime(el) {
+            if (el.classList.contains('unavailable')) return;
+            document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+    </script>
+</body>
+
+</html>
